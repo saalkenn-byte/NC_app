@@ -1,17 +1,26 @@
-const session = await getSession();
-if (!session || session.role !== "admin") {
-  redirect("/login");
-}
-
 import { desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { submissions } from "@/db/schema";
+import { destroySession, getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
+async function logoutAction() {
+  "use server";
+  await destroySession();
+  redirect("/login");
+}
+
 async function updateStatus(formData: FormData) {
   "use server";
+  const session = await getSession();
+  if (!session || session.role !== "admin") {
+    redirect("/login");
+  }
+
   const id = Number(formData.get("id"));
   const status = String(formData.get("status") || "nuut");
 
@@ -24,6 +33,11 @@ async function updateStatus(formData: FormData) {
 }
 
 export default async function AdminPage() {
+  const session = await getSession();
+  if (!session || session.role !== "admin") {
+    redirect("/login");
+  }
+
   const rows = await db
     .select()
     .from(submissions)
@@ -31,8 +45,24 @@ export default async function AdminPage() {
 
   return (
     <main className="mx-auto max-w-6xl p-6">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">Indienings ({rows.length})</h1>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/"
+            className="rounded border px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100"
+          >
+            Terug na Tuisblad
+          </Link>
+          <form action={logoutAction}>
+            <button
+              type="submit"
+              className="rounded bg-slate-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-900"
+            >
+              Teken uit
+            </button>
+          </form>
+        </div>
       </div>
 
       {rows.length === 0 ? (
@@ -94,5 +124,6 @@ export default async function AdminPage() {
     </main>
   );
 }
+
 
 
