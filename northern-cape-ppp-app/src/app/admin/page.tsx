@@ -1,3 +1,8 @@
+const session = await getSession();
+if (!session || session.role !== "admin") {
+  redirect("/login");
+}
+
 import { desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db";
