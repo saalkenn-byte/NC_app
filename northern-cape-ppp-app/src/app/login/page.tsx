@@ -11,7 +11,6 @@ async function loginAction(formData: FormData) {
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const password = String(formData.get("password") || "");
 
-  // 1. Ingeboude Admin-inlog met jou ADMIN_SECRET wagwoord uit Vercel
   const adminSecret = (process.env.ADMIN_SECRET || "").trim();
   if (adminSecret && password === adminSecret && email.includes("admin")) {
     await createSession({
@@ -24,11 +23,10 @@ async function loginAction(formData: FormData) {
     redirect("/admin");
   }
 
-  // 2. Soek gebruiker of verskaffer in Neon
   const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
   if (!user || !verifyPassword(password, user.passwordHash)) {
-    redirect("/login?error=Ongeldige+e-pos+of+wagwoord");
+    redirect("/login?error=Ongeldige+e-posadres+of+wagwoord.+Probeer+asseblief+weer.");
   }
 
   const role =
@@ -54,14 +52,16 @@ async function registerAction(formData: FormData) {
   const organisation = String(formData.get("organisation") || "").trim();
 
   if (!fullName || !email || password.length < 6) {
-    redirect("/login?error=Vul+alle+velde+in+(wagwoord+minstens+6+karakters)");
+    redirect(
+      "/login?error=Vul+asseblief+alle+verpligte+velde+in+(wagwoord+moet+minstens+6+karakters+wees)."
+    );
   }
 
   const role = roleInput === "verskaffer" ? "verskaffer" : "gebruiker";
 
   const existing = await db.select().from(users).where(eq(users.email, email)).limit(1);
   if (existing.length > 0) {
-    redirect("/login?error=Hierdie+e-posadres+is+reeds+geregistreer");
+    redirect("/login?error=Hierdie+e-posadres+is+reeds+geregistreer.+Teken+asseblief+in.");
   }
 
   const [created] = await db
@@ -94,118 +94,168 @@ export default async function LoginPage({
   const { error } = await searchParams;
 
   return (
-    <main className="mx-auto max-w-4xl p-6 md:py-12">
-      <h1 className="mb-2 text-2xl font-bold">Noord-Kaap PPP Portaal</h1>
-      <p className="mb-6 text-base text-gray-600">
-        Teken in of skep ’n rekening as Gebruiker of Verskaffer om toegang te kry.
-      </p>
+    <div className="min-h-screen bg-slate-100 text-slate-900">
+      {/* Boonste aksentstrook */}
+      <div className="h-2 w-full bg-gradient-to-r from-emerald-800 via-teal-600 to-amber-500" />
 
-      {error && (
-        <div className="mb-6 rounded-lg border border-red-300 bg-red-50 p-4 text-base text-red-800">
-          {error}
+      <div className="mx-auto flex min-h-[calc(100vh-0.5rem)] max-w-6xl flex-col justify-center px-4 py-10 sm:px-6 lg:px-8">
+        {/* Handelsmerk-opskrif */}
+        <div className="mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 p-8 text-white shadow-xl">
+          <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+            <div className="max-w-2xl">
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3.5 py-1 text-sm font-semibold text-emerald-300">
+                <span className="h-2 w-2 rounded-full bg-amber-400" />
+                Noord-Kaap Publiek-Private Vennootskap
+              </span>
+              <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
+                Noord-Kaap PPP &amp; Verskaffersportaal
+              </h1>
+              <p className="mt-3 text-base leading-relaxed text-slate-300 sm:text-lg">
+                Verbind plaaslike ondernemings, KMMO-verskaffers, beleggers en
+                werksoekers met grootskaalse energie-, mynbou- en
+                infrastruktuurprojekte regoor die Noord-Kaap.
+              </p>
+            </div>
+
+            {/* Vinnige hoogtepunte */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:w-80 lg:grid-cols-1">
+              <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm">
+                <p className="text-sm font-semibold text-amber-400">
+                  ⚡ Projekgeleenthede
+                </p>
+                <p className="mt-0.5 text-sm text-slate-300">
+                  Sonkrag, groenwaterstof &amp; mynbou-infrastruktuur
+                </p>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm">
+                <p className="text-sm font-semibold text-emerald-300">
+                  🏢 Geverifieerde Verskaffers
+                </p>
+                <p className="mt-0.5 text-sm text-slate-300">
+                  Direkte toegang tot subkontrakte en tenders
+                </p>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm">
+                <p className="text-sm font-semibold text-sky-300">
+                  🎓 Opleiding &amp; Werk
+                </p>
+                <p className="mt-0.5 text-sm text-slate-300">
+                  Vakleerlingskappe en streeksaanstellings
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
 
-      <div className="grid gap-8 md:grid-cols-2">
-        {/* Teken In */}
-        <section className="rounded-xl border bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-xl font-bold">Teken In</h2>
-          <form action={loginAction} className="space-y-4">
-            <div>
-              <label className="mb-1 block text-sm font-medium">E-posadres</label>
-              <input
-                type="email"
-                name="email"
-                required
-                placeholder="naam@voorbeeld.co.za"
-                className="w-full rounded border px-3 py-2 text-base"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">Wagwoord</label>
-              <input
-                type="password"
-                name="password"
-                required
-                placeholder="••••••••"
-                className="w-full rounded border px-3 py-2 text-base"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full rounded bg-emerald-700 px-4 py-2.5 text-base font-semibold text-white hover:bg-emerald-800"
-            >
-              Teken In
-            </button>
-          </form>
-        </section>
+        {/* Foutboodskap indien iets verkeerd gaan */}
+        {error && (
+          <div className="mb-6 flex items-center gap-3 rounded-xl border border-red-300 bg-red-50 px-5 py-4 text-base font-medium text-red-900 shadow-sm">
+            <span className="text-xl">⚠️</span>
+            <span>{error}</span>
+          </div>
+        )}
 
-        {/* Registreer */}
-        <section className="rounded-xl border bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-xl font-bold">Nuwe Rekening</h2>
-          <form action={registerAction} className="space-y-4">
+        {/* Twee kolomme: Teken In & Nuwe Rekening */}
+        <div className="grid gap-8 lg:grid-cols-12">
+          {/* Links: Bestaande gebruikers */}
+          <section className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-7 shadow-md lg:col-span-5 sm:p-8">
             <div>
-              <label className="mb-1 block text-sm font-medium">Tipe Rekening</label>
-              <select
-                name="role"
-                className="w-full rounded border px-3 py-2 text-base"
-              >
-                <option value="gebruiker">Gebruiker / Werksoeker / Belegger</option>
-                <option value="verskaffer">Verskaffer / Besigheid (KMMO)</option>
-              </select>
+              <div className="mb-6 flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-100 text-xl font-bold text-emerald-800">
+                  🔐
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-900">Teken In</h2>
+                  <p className="text-sm text-slate-500">
+                    Reeds geregistreer? Gaan voort na jou paneelbord
+                  </p>
+                </div>
+              </div>
+
+              <form action={loginAction} className="space-y-5">
+                <div>
+                  <label className="mb-1.5 block text-base font-semibold text-slate-700">
+                    E-posadres
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    placeholder="naam@voorbeeld.co.za"
+                    className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 transition focus:border-emerald-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1.5 block text-base font-semibold text-slate-700">
+                    Wagwoord
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    required
+                    placeholder="Voer jou wagwoord in"
+                    className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base text-slate-900 transition focus:border-emerald-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full rounded-xl bg-emerald-700 px-5 py-3.5 text-base font-bold text-white shadow-md transition hover:bg-emerald-800 active:scale-[0.99]"
+                >
+                  Teken In op Portaal →
+                </button>
+              </form>
             </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">Volle Naam</label>
-              <input
-                type="text"
-                name="fullName"
-                required
-                placeholder="Jan van der Merwe"
-                className="w-full rounded border px-3 py-2 text-base"
-              />
+
+            <div className="mt-8 rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm text-slate-600">
+              <strong className="text-slate-800">Wenk:</strong> Gebruikers,
+              verskaffers en administrateurs gebruik dieselfde aanmeldvorm. Die
+              stelsel herken outomaties jou rekeningrol.
             </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">
-                Besigheid / Organisasie (opsioneel)
-              </label>
-              <input
-                type="text"
-                name="organisation"
-                placeholder="bv. Namakwa Dienste (Edms) Bpk"
-                className="w-full rounded border px-3 py-2 text-base"
-              />
+          </section>
+
+          {/* Regs: Nuwe rekening registrasie */}
+          <section className="rounded-2xl border border-slate-200 bg-white p-7 shadow-md lg:col-span-7 sm:p-8">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-100 text-xl font-bold text-amber-800">
+                ✨
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900">
+                  Skep ’n Nuwe Rekening
+                </h2>
+                <p className="text-sm text-slate-500">
+                  Kies jou rol en registreer binne sekondes
+                </p>
+              </div>
             </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">E-posadres</label>
-              <input
-                type="email"
-                name="email"
-                required
-                placeholder="naam@voorbeeld.co.za"
-                className="w-full rounded border px-3 py-2 text-base"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">Kies Wagwoord</label>
-              <input
-                type="password"
-                name="password"
-                minLength={6}
-                required
-                placeholder="Minstens 6 karakters"
-                className="w-full rounded border px-3 py-2 text-base"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full rounded bg-slate-800 px-4 py-2.5 text-base font-semibold text-white hover:bg-slate-900"
-            >
-              Registreer
-            </button>
-          </form>
-        </section>
-      </div>
-    </main>
-  );
+
+            <form action={registerAction} className="space-y-5">
+              <div>
+                <label className="mb-1.5 block text-base font-semibold text-slate-700">
+                  Ek registreer as:
+                </label>
+                <select
+                  name="role"
+className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-base font-medium text-slate-900 transition focus:border-emerald-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
+>
+
+👤 Gebruiker / Werksoeker / Belegger
+
+
+🏭 Verskaffer / Besigheid / KMMO
+
+
+Volle Naam *
+Besigheid / Organisasie
+E-posadres *
+Kies Wagwoord *
+Skep My Rekening
+
+
+
+
+
+);
 }
-
