@@ -1,7 +1,9 @@
 import { asc, desc } from "drizzle-orm";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { db } from "@/db";
 import { businesses, opportunities, projects } from "@/db/schema";
+import { destroySession, getSession } from "@/lib/auth";
 import {
   CommunityApp,
   type BusinessRow,
@@ -11,7 +13,18 @@ import {
 
 export const dynamic = "force-dynamic";
 
+async function logoutAction() {
+  "use server";
+  await destroySession();
+  redirect("/login");
+}
+
 export default async function HomePage() {
+  const session = await getSession();
+  if (!session) {
+    redirect("/login");
+  }
+
   const [projectRows, businessRows, opportunityRows] = await Promise.all([
     db
       .select()
@@ -73,17 +86,38 @@ export default async function HomePage() {
 
   return (
     <>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b bg-slate-900 px-4 py-2.5 text-sm text-white">
+        <div>
+          Welkom, <strong>{session.fullName}</strong>{" "}
+          <span className="ml-1 rounded bg-emerald-700 px-2 py-0.5 text-xs font-semibold uppercase">
+            {session.role}
+          </span>
+        </div>
+        <div className="flex items-center gap-3">
+          {session.role === "admin" && (
+            <Link
+              href="/admin"
+              className="rounded bg-amber-500 px-3 py-1 text-xs font-bold text-slate-950 hover:bg-amber-400"
+            >
+              Admin Paneel
+            </Link>
+          )}
+          <form action={logoutAction}>
+            <button
+              type="submit"
+              className="rounded border border-slate-600 px-3 py-1 text-xs hover:bg-slate-800"
+            >
+              Teken uit
+            </button>
+          </form>
+        </div>
+      </div>
+
       <CommunityApp
         projects={projectData}
         businesses={businessData}
         opportunities={opportunityData}
       />
-      <Link
-        href="/admin"
-        className="fixed bottom-4 right-4 z-50 rounded-full bg-emerald-800 px-4 py-2 text-sm font-semibold text-white shadow-lg hover:bg-emerald-700"
-      >
-        Admin
-      </Link>
     </>
   );
 }
