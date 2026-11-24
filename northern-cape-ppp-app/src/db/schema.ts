@@ -84,3 +84,13 @@ export const submissions = pgTable("bb_submissions", {
   status: varchar("status", { length: 40 }).notNull().default("nuut"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+/** Gebruikers, verskaffers en administrateurs. */
+export const users = pgTable("bb_users", {
+  id: serial("id").primaryKey(),
+  fullName: varchar("full_name", { length: 180 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  role: varchar("role", { length: 40 }).notNull().default("gebruiker"), // gebruiker | verskaffer | admin
+  organisation: varchar("organisation", { length: 220 }).notNull().default(""),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
