@@ -1,4 +1,5 @@
 import { asc, desc } from "drizzle-orm";
+import Link from "next/link";
 import { db } from "@/db";
 import { businesses, opportunities, projects } from "@/db/schema";
 import {
@@ -71,10 +72,19 @@ export default async function HomePage() {
   }));
 
   return (
-    <CommunityApp
-      projects={projectData}
-      businesses={businessData}
-      opportunities={opportunityData}
-    />
+    <>
+      <CommunityApp
+        projects={projectData}
+        businesses={businessData}
+        opportunities={opportunityData}
+      />
+      <Link
+        href="/admin"
+        className="fixed bottom-4 right-4 z-50 rounded-full bg-emerald-800 px-4 py-2 text-sm font-semibold text-white shadow-lg hover:bg-emerald-700"
+      >
+        Admin
+      </Link>
+    </>
   );
 }
+
