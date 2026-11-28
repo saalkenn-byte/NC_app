@@ -23,17 +23,6 @@ export function LoginClient({
   const [registerState, formRegisterAction, registerPending] = useActionState(registerAction, {});
   const [resetState, formResetAction, resetPending] = useActionState(resetPasswordAction, {});
 
-  const EyeToggle = () => (
-    <button
-      type="button"
-      onClick={() => setShowPassword((prev) => !prev)}
-      className="absolute right-3 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-      aria-label={showPassword ? "Versteek wagwoord" : "Wys wagwoord"}
-    >
-      {showPassword ? "Versteek" : "Wys"}
-    </button>
-  );
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12 text-slate-900">
       <div className="w-full max-w-md overflow-hidden rounded-2xl border border-slate-800 bg-white shadow-2xl">
@@ -57,47 +46,46 @@ export function LoginClient({
           <button
             type="button"
             onClick={() => setMode("login")}
-            className={`flex-1 py-3.5 text-center transition ${
+            className={
               mode === "login"
-                ? "border-b-2 border-emerald-700 bg-white text-emerald-800"
-                : "text-slate-500 hover:text-slate-800"
-            }`}
+                ? "flex-1 border-b-2 border-emerald-700 bg-white py-3.5 text-center text-emerald-800"
+                : "flex-1 py-3.5 text-center text-slate-500 hover:text-slate-800"
+            }
           >
             Teken Aan
           </button>
           <button
             type="button"
             onClick={() => setMode("register")}
-            className={`flex-1 py-3.5 text-center transition ${
+            className={
               mode === "register"
-                ? "border-b-2 border-emerald-700 bg-white text-emerald-800"
-                : "text-slate-500 hover:text-slate-800"
-            }`}
+                ? "flex-1 border-b-2 border-emerald-700 bg-white py-3.5 text-center text-emerald-800"
+                : "flex-1 py-3.5 text-center text-slate-500 hover:text-slate-800"
+            }
           >
             Registreer
           </button>
           <button
             type="button"
             onClick={() => setMode("forgot")}
-            className={`flex-1 py-3.5 text-center transition ${
+            className={
               mode === "forgot"
-                ? "border-b-2 border-emerald-700 bg-white text-emerald-800"
-                : "text-slate-500 hover:text-slate-800"
-            }`}
+                ? "flex-1 border-b-2 border-emerald-700 bg-white py-3.5 text-center text-emerald-800"
+                : "flex-1 py-3.5 text-center text-slate-500 hover:text-slate-800"
+            }
           >
             Wagwoord Vergeet
           </button>
         </div>
 
         <div className="p-6">
-          {/* AANTEKEN */}
           {mode === "login" && (
             <form action={formLoginAction} className="space-y-4">
-              {loginState?.error && (
-                <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+              {loginState?.error ? (
+                <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
                   {loginState.error}
-                </div>
-              )}
+                </p>
+              ) : null}
 
               <div>
                 <label className="mb-1 block text-xs font-bold uppercase text-slate-600">
@@ -133,7 +121,13 @@ export function LoginClient({
                     placeholder="••••••••"
                     className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 pr-20 text-sm focus:border-emerald-700 focus:outline-none"
                   />
-                  <EyeToggle />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  >
+                    {showPassword ? "Versteek" : "Wys"}
+                  </button>
                 </div>
               </div>
 
@@ -147,14 +141,13 @@ export function LoginClient({
             </form>
           )}
 
-          {/* REGISTREER */}
           {mode === "register" && (
             <form action={formRegisterAction} className="space-y-4">
-              {registerState?.error && (
-                <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+              {registerState?.error ? (
+                <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
                   {registerState.error}
-                </div>
-              )}
+                </p>
+              ) : null}
 
               <div>
                 <label className="mb-1 block text-xs font-bold uppercase text-slate-600">
@@ -204,7 +197,7 @@ export function LoginClient({
                     type="text"
                     name="organisation"
                     placeholder="Besigheidsnaam"
-                    className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:border-emerald-700 focus:outline-none"
+                    className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-emerald-700 focus:outline-none"
                   />
                 </div>
               </div>
@@ -222,7 +215,13 @@ export function LoginClient({
                     placeholder="Minimum 6 karakters"
                     className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 pr-20 text-sm focus:border-emerald-700 focus:outline-none"
                   />
-                  <EyeToggle />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                  >
+                    {showPassword ? "Versteek" : "Wys"}
+                  </button>
                 </div>
               </div>
 
@@ -230,24 +229,18 @@ export function LoginClient({
                 type="submit"
                 disabled={registerPending}
                 className="w-full rounded-xl bg-emerald-800 py-3 text-sm font-bold text-white hover:bg-emerald-900 disabled:opacity-60"
-              >
-                {registerPending ? "Skep rekening..." : "Registreer Rekening"}
-              </button>
-            </form>
-          )}
+              >{registerPending ? "Skep rekening..." : "Registreer Rekening"}
 
-          {/* WAGWOORD VERGEET */}
-          {mode === "forgot" && (
-            <form action={formResetAction} className="space-y-4">
-              {resetState?.error && (
-                <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-                  {resetState.error}
+
 )}
-{resetState?.success && (
+{mode === "forgot" && (
 
+{resetState?.error ? (
+{resetState.error}
+) : null}
+{resetState?.success ? (
 {resetState.success}
-
-)}
+) : null}
 Geregistreerde E-posadres
 Nuwe Wagwoord
 <input
@@ -258,6 +251,12 @@ minLength={6}
 placeholder="Nuwe wagwoord (min 6 karakters)"
 className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 pr-20 text-sm focus:border-emerald-700 focus:outline-none"
 />
+<button
+type="button"
+onClick={() => setShowPassword((prev) => !prev)}
+className="absolute right-3 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+>
+{showPassword ? "Versteek" : "Wys"}
 
 
 Bevestig Nuwe Wagwoord
@@ -269,6 +268,12 @@ minLength={6}
 placeholder="Tik nuwe wagwoord weer"
 className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 pr-20 text-sm focus:border-emerald-700 focus:outline-none"
 />
+<button
+type="button"
+onClick={() => setShowPassword((prev) => !prev)}
+className="absolute right-3 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+>
+{showPassword ? "Versteek" : "Wys"}
 
 
 {resetPending ? "Herstel wagwoord..." : "Stoor Nuwe Wagwoord"}
