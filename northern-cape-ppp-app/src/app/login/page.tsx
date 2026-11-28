@@ -1,4 +1,3 @@
-```tsx
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
