@@ -131,3 +131,6 @@ export default async function LoginPage() {
       loginAction={loginAction}
       registerAction={registerAction}
       resetPasswordAction={resetPasswordAction}
+    />
+  );
+}
