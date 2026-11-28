@@ -40,46 +40,46 @@ export default async function HomePage() {
         .orderBy(desc(submissions.createdAt)),
     ]);
 
-  // Map approved "belegging" submissions into Projekte & beleggings
+  // Goedgekeurde beleggings/plasings vanaf bb_submissions
   const approvedProjectSubmissions: ProjectRow[] = approvedSubmissions
     .filter((sub) => sub.type === "belegging")
     .map((sub) => ({
       id: 100000 + sub.id,
       slug: `plasing-${sub.id}`,
       title: sub.organisation || sub.referenceLabel || sub.fullName,
-      category: sub.referenceLabel || "Belegging & Plasing",
-      location: "Noord-Kaap / Boegoebaai",
+      category: sub.category || sub.referenceLabel || "Belegging & Plasing",
+      location: "Boegoebaai / Noord-Kaap",
       stage: "Goedgekeurde Plasing",
       timeline: "Aktief",
       investment: "Op aanvraag",
       jobs: 0,
       summary: sub.message,
       description: sub.message,
-      requirements: "Geverifieerde indiening via portaal",
-      opportunityType: sub.referenceLabel || "Belegging / Vennootskap",
+      requirements: "Goedgekeurde indiening via die Noord-Kaap PPP portaal",
+      opportunityType: sub.referenceLabel || sub.category || "Belegging / Plasing",
       contactName: sub.fullName,
       contactEmail: sub.email,
       verified: true,
       featured: false,
     }));
 
-  // Map approved "besigheid" submissions into Besigheidsregister
+  // Goedgekeurde geregistreerde besighede vanaf bb_submissions
   const approvedBusinessSubmissions: BusinessRow[] = approvedSubmissions
     .filter((sub) => sub.type === "besigheid")
     .map((sub) => ({
       id: 100000 + sub.id,
       name: sub.organisation || sub.fullName,
-      category: sub.referenceLabel || "Geregistreerde Verskaffer",
-      location: "Noord-Kaap / Boegoebaai",
-      entityType: "Geregistreerde Besigheid",
-      services: sub.referenceLabel || "Verskaffer & Dienste",
+      category: sub.category || sub.referenceLabel || "Geregistreerde Besigheid",
+      location: "Boegoebaai / Noord-Kaap",
+      entityType: "Geregistreerde Onderneming",
+      services: sub.referenceLabel || sub.category || "Verskaffer & Dienste",
       description: sub.message,
       contactPerson: sub.fullName,
       contactEmail: sub.email,
       phone: sub.phone || "Op aanvraag",
       cipcVerified: true,
       taxVerified: true,
-      bbbeeLevel: "Geverifieer",
+      bbbeeLevel: "Goedgekeur",
     }));
 
   const projectData: ProjectRow[] = [
