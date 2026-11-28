@@ -1,4 +1,5 @@
-import { asc, desc, eq } from "drizzle-orm";
+```tsx
+import { and, asc, desc, eq, ne } from "drizzle-orm";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
@@ -30,17 +31,25 @@ export default async function HomePage() {
       db
         .select()
         .from(projects)
+        .where(eq(projects.active, true))
         .orderBy(desc(projects.featured), asc(projects.title)),
-      db.select().from(businesses).orderBy(asc(businesses.name)),
-      db.select().from(opportunities).orderBy(asc(opportunities.closingDate)),
+      db
+        .select()
+        .from(businesses)
+        .where(ne(businesses.status, "onaktief"))
+        .orderBy(asc(businesses.name)),
+      db
+        .select()
+        .from(opportunities)
+        .where(eq(opportunities.active, true))
+        .orderBy(asc(opportunities.closingDate)),
       db
         .select()
         .from(submissions)
-        .where(eq(submissions.status, "goedgekeur"))
+        .where(and(eq(submissions.status, "goedgekeur")))
         .orderBy(desc(submissions.createdAt)),
     ]);
 
-  // Goedgekeurde beleggings/plasings vanaf bb_submissions
   const approvedProjectSubmissions: ProjectRow[] = approvedSubmissions
     .filter((sub) => sub.type === "belegging")
     .map((sub) => ({
@@ -63,7 +72,6 @@ export default async function HomePage() {
       featured: false,
     }));
 
-  // Goedgekeurde geregistreerde besighede vanaf bb_submissions
   const approvedBusinessSubmissions: BusinessRow[] = approvedSubmissions
     .filter((sub) => sub.type === "besigheid")
     .map((sub) => ({
