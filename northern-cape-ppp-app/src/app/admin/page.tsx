@@ -20,7 +20,6 @@ async function logoutAction() {
   redirect("/login");
 }
 
-/* ---- INDIENINGS ---- */
 async function updateSubmission(formData: FormData) {
   "use server";
   await requireAdmin();
@@ -40,7 +39,6 @@ async function deleteSubmission(formData: FormData) {
   revalidatePath("/");
 }
 
-/* ---- GEBRUIKERS & SUBSCRIPTIONS ---- */
 async function updateUser(formData: FormData) {
   "use server";
   await requireAdmin();
@@ -76,12 +74,11 @@ async function deleteUser(formData: FormData) {
   "use server";
   const session = await requireAdmin();
   const id = Number(formData.get("id"));
-  if (id === session.id) return; // Verhoed dat admin homself per ongeluk uitvee
+  if (id === session.id) return;
   await db.delete(users).where(eq(users.id, id));
   revalidatePath("/admin");
 }
 
-/* ---- BESIGHEDE / VERSKAFFERS ---- */
 async function updateBusiness(formData: FormData) {
   "use server";
   await requireAdmin();
@@ -101,7 +98,6 @@ async function deleteBusiness(formData: FormData) {
   revalidatePath("/");
 }
 
-/* ---- PROJEKTE / PRODUKTE ---- */
 async function toggleProjectActive(formData: FormData) {
   "use server";
   await requireAdmin();
@@ -121,7 +117,6 @@ async function deleteProject(formData: FormData) {
   revalidatePath("/");
 }
 
-/* ---- VAKATURES / GELEENTHEDE ---- */
 async function toggleOpportunityActive(formData: FormData) {
   "use server";
   await requireAdmin();
@@ -200,7 +195,6 @@ export default async function AdminPage() {
       </header>
 
       <main className="mx-auto max-w-6xl space-y-10 px-4 py-8 sm:px-6">
-        {/* Oorsig Statistieke */}
         <section className="grid grid-cols-2 gap-4 lg:grid-cols-5">
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <p className="text-xs font-bold uppercase text-slate-500">Nuwe Indienings</p>
@@ -250,17 +244,21 @@ export default async function AdminPage() {
                           {item.type}
                         </span>
                         <span
-                          className={`rounded-lg border px-2.5 py-1 text-xs font-bold uppercase ${
-                            badgeColors[item.status] || "bg-slate-100 text-slate-800"
-                          }`}
+                          className={
+                            "rounded-lg border px-2.5 py-1 text-xs font-bold uppercase " +
+                            (badgeColors[item.status] || "bg-slate-100 text-slate-800")
+                          }
                         >
                           {item.status}
                         </span>
-{item.fullName}
-{item.organisation && {item.organisation} • }
+                        <h3 className="text-lg font-bold text-slate-900">{item.fullName}</h3>
+                      </div>
+                      <p className="mt-1 text-sm text-slate-600">
+{item.organisation ? item.organisation + " • " : ""}
 {item.email}
-{item.phone ?  • Tel: ${item.phone} : ""}
-{item.category ?  • Kategorie: ${item.category} : ""}
+{item.phone ? " • Tel: " + item.phone : ""}
+{item.category ? " • Kategorie: " + item.category : ""}
+
 Nuut
 Hersien
 Gekontak
@@ -286,21 +284,29 @@ Delete
 {userRows.map((u) => (
 <div
 key={u.id}
-className={rounded-2xl border p-5 shadow-sm ${ u.active ? "border-slate-200 bg-white" : "border-red-200 bg-red-50/50" }}
+className={
+u.active
+? "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+: "rounded-2xl border border-red-200 bg-red-50/50 p-5 shadow-sm"
+}
 >
 
 
 
 {u.fullName}
 <span
-className={rounded px-2 py-0.5 text-xs font-bold uppercase ${ u.active ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800" }}
+className={
+u.active
+? "rounded bg-emerald-100 px-2 py-0.5 text-xs font-bold uppercase text-emerald-800"
+: "rounded bg-red-100 px-2 py-0.5 text-xs font-bold uppercase text-red-800"
+}
 >
 {u.active ? "Aktief" : "Onaktief"}
 
 
 {u.subscriptionPlan} ({u.subscriptionStatus})
 
-{u.email} {u.organisation ? • ${u.organisation} : ""}
+{u.email} {u.organisation ? "• " + u.organisation : ""}
 Gebruiker
 Verskaffer
 Admin
@@ -315,14 +321,14 @@ Rekening: Aktief
 Rekening: Onaktief
 Stoor
 
-{u.id !== session.id && (
+{u.id !== session.id ? (
 
 
 
 Delete
 
 
-)}
+) : null}
 
 
 
@@ -337,7 +343,11 @@ Delete
 
 {b.name}
 <span
-className={rounded px-2 py-0.5 text-xs font-bold uppercase ${ b.status === "onaktief" ? "bg-red-100 text-red-800" : "bg-emerald-100 text-emerald-800" }}
+className={
+b.status === "onaktief"
+? "rounded bg-red-100 px-2 py-0.5 text-xs font-bold uppercase text-red-800"
+: "rounded bg-emerald-100 px-2 py-0.5 text-xs font-bold uppercase text-emerald-800"
+}
 >
 {b.status}
 
@@ -364,7 +374,11 @@ Delete
 
 {p.title}
 <span
-className={rounded px-2 py-0.5 text-xs font-bold uppercase ${ p.active ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800" }}
+className={
+p.active
+? "rounded bg-emerald-100 px-2 py-0.5 text-xs font-bold uppercase text-emerald-800"
+: "rounded bg-red-100 px-2 py-0.5 text-xs font-bold uppercase text-red-800"
+}
 >
 {p.active ? "Aktief" : "Onaktief"}
 
@@ -391,7 +405,11 @@ Delete
 
 {o.title}
 <span
-className={rounded px-2 py-0.5 text-xs font-bold uppercase ${ o.active ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800" }}
+className={
+o.active
+? "rounded bg-emerald-100 px-2 py-0.5 text-xs font-bold uppercase text-emerald-800"
+: "rounded bg-red-100 px-2 py-0.5 text-xs font-bold uppercase text-red-800"
+}
 >
 {o.active ? "Aktief" : "Onaktief"}
 
@@ -399,17 +417,11 @@ className={rounded px-2 py-0.5 text-xs font-bold uppercase ${ o.active ? "bg-eme
 Aktief
 Onaktief
 
-
 Stoor
 
 Delete
 
-
-
-
 ))}
-
-
 
 );
 }
