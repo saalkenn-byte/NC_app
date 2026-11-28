@@ -24,264 +24,214 @@ export function LoginClient({
   const [resetState, formResetAction, resetPending] = useActionState(resetPasswordAction, {});
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12 text-slate-900">
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-slate-800 bg-white shadow-2xl">
-        <div className="bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 px-6 py-7 text-white">
-          <span className="inline-block rounded-full bg-amber-400/20 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-amber-300">
+    <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-12 text-slate-900">
+      <section className="w-full max-w-md overflow-hidden rounded-2xl border border-slate-800 bg-white shadow-2xl">
+        <header className="bg-slate-900 px-6 py-7 text-white">
+          <span className="inline-block rounded-full bg-amber-400/20 px-3 py-0.5 text-xs font-bold uppercase text-amber-300">
             Boegoebaai • Noord-Kaap PPP
           </span>
-          <h1 className="mt-2 text-2xl font-extrabold">
-            {mode === "login" && "Teken aan op Portaal"}
-            {mode === "register" && "Skep Nuwe Rekening"}
-            {mode === "forgot" && "Herstel Jou Wagwoord"}
-          </h1>
+          <h1 className="mt-2 text-2xl font-extrabold">Noord-Kaap PPP Portaal</h1>
           <p className="mt-1 text-sm text-slate-300">
-            {mode === "login" && "Kry toegang tot projekte, besighede en geleenthede"}
-            {mode === "register" && "Registreer as inwoner, werksoeker of verskaffer"}
-            {mode === "forgot" && "Stel ’n nuwe wagwoord op vir jou bestaande e-posadres"}
+            Teken aan, registreer ’n rekening of herstel jou wagwoord
           </p>
-        </div>
+        </header>
 
-        <div className="flex border-b border-slate-200 bg-slate-50 text-xs font-bold uppercase tracking-wider">
+        <nav className="flex border-b border-slate-200 bg-slate-50 text-xs font-bold uppercase">
           <button
             type="button"
             onClick={() => setMode("login")}
-            className={
-              mode === "login"
-                ? "flex-1 border-b-2 border-emerald-700 bg-white py-3.5 text-center text-emerald-800"
-                : "flex-1 py-3.5 text-center text-slate-500 hover:text-slate-800"
-            }
+            className="flex-1 py-3.5 text-center text-slate-800 hover:bg-white"
           >
             Teken Aan
           </button>
           <button
             type="button"
             onClick={() => setMode("register")}
-            className={
-              mode === "register"
-                ? "flex-1 border-b-2 border-emerald-700 bg-white py-3.5 text-center text-emerald-800"
-                : "flex-1 py-3.5 text-center text-slate-500 hover:text-slate-800"
-            }
+            className="flex-1 py-3.5 text-center text-slate-800 hover:bg-white"
           >
             Registreer
           </button>
           <button
             type="button"
             onClick={() => setMode("forgot")}
-            className={
-              mode === "forgot"
-                ? "flex-1 border-b-2 border-emerald-700 bg-white py-3.5 text-center text-emerald-800"
-                : "flex-1 py-3.5 text-center text-slate-500 hover:text-slate-800"
-            }
+            className="flex-1 py-3.5 text-center text-slate-800 hover:bg-white"
           >
             Wagwoord Vergeet
           </button>
-        </div>
+        </nav>
 
-        <div className="p-6">
-          {mode === "login" && (
-            <form action={formLoginAction} className="space-y-4">
-              {loginState?.error ? (
-                <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-                  {loginState.error}
-                </p>
-              ) : null}
+        {mode === "login" && (
+          <form action={formLoginAction} className="space-y-4 p-6">
+            {loginState.error && (
+              <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+                {loginState.error}
+              </p>
+            )}
+            <label className="block text-xs font-bold uppercase text-slate-600">
+              E-posadres
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder="naam@voorbeeld.co.za"
+                className="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-normal"
+              />
+            </label>
+            <label className="block text-xs font-bold uppercase text-slate-600">
+              Wagwoord
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                required
+                placeholder="••••••••"
+                className="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-normal"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="text-xs font-semibold text-emerald-700 hover:underline"
+            >
+              {showPassword ? "Versteek wagwoord" : "Wys wagwoord"}
+            </button>
+            <button
+              type="submit"
+              disabled={loginPending}
+              className="w-full rounded-xl bg-emerald-800 py-3 text-sm font-bold text-white hover:bg-emerald-900"
+            >
+              {loginPending ? "Besig..." : "Teken Aan"}
+            </button>
+          </form>
+        )}
 
-              <div>
-                <label className="mb-1 block text-xs font-bold uppercase text-slate-600">
-                  E-posadres
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="naam@voorbeeld.co.za"
-                  className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-emerald-700 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <div className="mb-1 flex items-center justify-between">
-                  <label className="text-xs font-bold uppercase text-slate-600">
-                    Wagwoord
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setMode("forgot")}
-                    className="text-xs font-semibold text-emerald-700 hover:underline"
-                  >
-                    Wagwoord vergeet?
-                  </button>
-                </div>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    required
-                    placeholder="••••••••"
-                    className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 pr-20 text-sm focus:border-emerald-700 focus:outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                  >
-                    {showPassword ? "Versteek" : "Wys"}
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loginPending}
-                className="w-full rounded-xl bg-emerald-800 py-3 text-sm font-bold text-white hover:bg-emerald-900 disabled:opacity-60"
+        {mode === "register" && (
+          <form action={formRegisterAction} className="space-y-4 p-6">
+            {registerState.error && (
+              <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+                {registerState.error}
+              </p>
+            )}
+            <label className="block text-xs font-bold uppercase text-slate-600">
+              Volle Naam
+              <input
+                type="text"
+                name="fullName"
+                required
+                className="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-normal"
+              />
+            </label>
+            <label className="block text-xs font-bold uppercase text-slate-600">
+              E-posadres
+              <input
+                type="email"
+                name="email"
+                required
+                className="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-normal"
+              />
+            </label>
+            <label className="block text-xs font-bold uppercase text-slate-600">
+              Rekeningtipe
+              <select
+                name="role"
+                className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm font-normal"
               >
-                {loginPending ? "Besig om aan te teken..." : "Teken Aan"}
-              </button>
-            </form>
-          )}
+                <option value="gebruiker">Gebruiker / Inwoner</option>
+                <option value="verskaffer">Verskaffer / Besigheid</option>
+              </select>
+            </label>
+            <label className="block text-xs font-bold uppercase text-slate-600">
+              Organisasie (Opsioneel)
+              <input
+                type="text"
+                name="organisation"
+                className="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-normal"
+              />
+            </label>
+            <label className="block text-xs font-bold uppercase text-slate-600">
+              Kies Wagwoord
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                required
+                minLength={6}
+                className="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-normal"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="text-xs font-semibold text-emerald-700 hover:underline"
+            >
+              {showPassword ? "Versteek wagwoord" : "Wys wagwoord"}
+            </button>
+            <button
+              type="submit"
+              disabled={registerPending}
+              className="w-full rounded-xl bg-emerald-800 py-3 text-sm font-bold text-white hover:bg-emerald-900"
+            >
+              {registerPending ? "Skep rekening..." : "Registreer Rekening"}
+            </button>
+          </form>
+        )}
 
-          {mode === "register" && (
-            <form action={formRegisterAction} className="space-y-4">
-              {registerState?.error ? (
-                <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-                  {registerState.error}
-                </p>
-              ) : null}
-
-              <div>
-                <label className="mb-1 block text-xs font-bold uppercase text-slate-600">
-                  Volle Naam
-                </label>
-                <input
-                  type="text"
-                  name="fullName"
-                  required
-                  placeholder="Jan van der Merwe"
-                  className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-emerald-700 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs font-bold uppercase text-slate-600">
-                  E-posadres
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="naam@voorbeeld.co.za"
-                  className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-emerald-700 focus:outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1 block text-xs font-bold uppercase text-slate-600">
-                    Rekeningtipe
-                  </label>
-                  <select
-                    name="role"
-                    className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm focus:border-emerald-700 focus:outline-none"
-                  >
-                    <option value="gebruiker">Gebruiker / Inwoner</option>
-                    <option value="verskaffer">Verskaffer / Besigheid</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="mb-1 block text-xs font-bold uppercase text-slate-600">
-                    Organisasie (Opsioneel)
-                  </label>
-                  <input
-                    type="text"
-                    name="organisation"
-                    placeholder="Besigheidsnaam"
-                    className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:border-emerald-700 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs font-bold uppercase text-slate-600">
-                  Kies Wagwoord
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    required
-                    minLength={6}
-                    placeholder="Minimum 6 karakters"
-                    className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 pr-20 text-sm focus:border-emerald-700 focus:outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                  >
-                    {showPassword ? "Versteek" : "Wys"}
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={registerPending}
-                className="w-full rounded-xl bg-emerald-800 py-3 text-sm font-bold text-white hover:bg-emerald-900 disabled:opacity-60"
-              >{registerPending ? "Skep rekening..." : "Registreer Rekening"}
-
-
-)}
-{mode === "forgot" && (
-
-{resetState?.error ? (
-{resetState.error}
-) : null}
-{resetState?.success ? (
-{resetState.success}
-) : null}
-Geregistreerde E-posadres
-Nuwe Wagwoord
-<input
-type={showPassword ? "text" : "password"}
-name="newPassword"
-required
-minLength={6}
-placeholder="Nuwe wagwoord (min 6 karakters)"
-className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 pr-20 text-sm focus:border-emerald-700 focus:outline-none"
-/>
-<button
-type="button"
-onClick={() => setShowPassword((prev) => !prev)}
-className="absolute right-3 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900"
->
-{showPassword ? "Versteek" : "Wys"}
-
-
-Bevestig Nuwe Wagwoord
-<input
-type={showPassword ? "text" : "password"}
-name="confirmPassword"
-required
-minLength={6}
-placeholder="Tik nuwe wagwoord weer"
-className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 pr-20 text-sm focus:border-emerald-700 focus:outline-none"
-/>
-<button
-type="button"
-onClick={() => setShowPassword((prev) => !prev)}
-className="absolute right-3 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900"
->
-{showPassword ? "Versteek" : "Wys"}
-
-
-{resetPending ? "Herstel wagwoord..." : "Stoor Nuwe Wagwoord"}
-
-
-)}
-
-
-
-);
+        {mode === "forgot" && (
+          <form action={formResetAction} className="space-y-4 p-6">
+            {resetState.error && (
+              <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+                {resetState.error}
+              </p>
+            )}
+            {resetState.success && (
+              <p className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+                {resetState.success}
+              </p>
+            )}
+            <label className="block text-xs font-bold uppercase text-slate-600">
+              Geregistreerde E-posadres
+              <input
+                type="email"
+                name="email"
+                required
+                className="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-normal"
+              />
+            </label>
+            <label className="block text-xs font-bold uppercase text-slate-600">
+              Nuwe Wagwoord
+              <input
+                type={showPassword ? "text" : "password"}
+                name="newPassword"
+                required
+                minLength={6}
+                className="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-normal"
+              />
+            </label>
+            <label className="block text-xs font-bold uppercase text-slate-600">
+              Bevestig Nuwe Wagwoord
+              <input
+                type={showPassword ? "text" : "password"}
+                name="confirmPassword"
+                required
+                minLength={6}
+                className="mt-1 w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-normal"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="text-xs font-semibold text-emerald-700 hover:underline"
+            >
+              {showPassword ? "Versteek wagwoord" : "Wys wagwoord"}
+            </button>
+            <button
+              type="submit"
+              disabled={resetPending}
+              className="w-full rounded-xl bg-amber-500 py-3 text-sm font-bold text-slate-950 hover:bg-amber-400"
+            >
+              {resetPending ? "Herstel..." : "Stoor Nuwe Wagwoord"}
+            </button>
+          </form>
+        )}
+      </section>
+    </main>
+  );
 }
