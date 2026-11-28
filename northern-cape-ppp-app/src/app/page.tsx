@@ -1,4 +1,3 @@
-```tsx
 import { and, asc, desc, eq, ne } from "drizzle-orm";
 import Link from "next/link";
 import { redirect } from "next/navigation";
