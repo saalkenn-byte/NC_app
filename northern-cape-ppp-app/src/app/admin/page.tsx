@@ -24,6 +24,9 @@ async function updateStatus(formData: FormData) {
 
   await db.update(submissions).set({ status }).where(eq(submissions.id, id));
   revalidatePath("/admin");
+  await db.update(submissions).set({ status }).where(eq(submissions.id, id));
+  revalidatePath("/admin");
+  revalidatePath("/");
 }
 
 const badgeColors: Record<string, string> = {
