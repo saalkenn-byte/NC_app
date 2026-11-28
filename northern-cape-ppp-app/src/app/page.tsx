@@ -1,8 +1,8 @@
-import { asc, desc } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { businesses, opportunities, projects } from "@/db/schema";
+import { businesses, opportunities, projects, submissions } from "@/db/schema";
 import { destroySession, getSession } from "@/lib/auth";
 import {
   CommunityApp,
@@ -25,50 +25,104 @@ export default async function HomePage() {
     redirect("/login");
   }
 
-  const [projectRows, businessRows, opportunityRows] = await Promise.all([
-    db
-      .select()
-      .from(projects)
-      .orderBy(desc(projects.featured), asc(projects.title)),
-    db.select().from(businesses).orderBy(asc(businesses.name)),
-    db.select().from(opportunities).orderBy(asc(opportunities.closingDate)),
-  ]);
+  const [projectRows, businessRows, opportunityRows, approvedSubmissions] =
+    await Promise.all([
+      db
+        .select()
+        .from(projects)
+        .orderBy(desc(projects.featured), asc(projects.title)),
+      db.select().from(businesses).orderBy(asc(businesses.name)),
+      db.select().from(opportunities).orderBy(asc(opportunities.closingDate)),
+      db
+        .select()
+        .from(submissions)
+        .where(eq(submissions.status, "goedgekeur"))
+        .orderBy(desc(submissions.createdAt)),
+    ]);
 
-  const projectData: ProjectRow[] = projectRows.map((row) => ({
-    id: row.id,
-    slug: row.slug,
-    title: row.title,
-    category: row.category,
-    location: row.location,
-    stage: row.stage,
-    timeline: row.timeline,
-    investment: row.investment,
-    jobs: row.jobs,
-    summary: row.summary,
-    description: row.description,
-    requirements: row.requirements,
-    opportunityType: row.opportunityType,
-    contactName: row.contactName,
-    contactEmail: row.contactEmail,
-    verified: row.verified,
-    featured: row.featured,
-  }));
+  // Map approved "belegging" submissions into Projekte & beleggings
+  const approvedProjectSubmissions: ProjectRow[] = approvedSubmissions
+    .filter((sub) => sub.type === "belegging")
+    .map((sub) => ({
+      id: 100000 + sub.id,
+      slug: `plasing-${sub.id}`,
+      title: sub.organisation || sub.referenceLabel || sub.fullName,
+      category: sub.referenceLabel || "Belegging & Plasing",
+      location: "Noord-Kaap / Boegoebaai",
+      stage: "Goedgekeurde Plasing",
+      timeline: "Aktief",
+      investment: "Op aanvraag",
+      jobs: 0,
+      summary: sub.message,
+      description: sub.message,
+      requirements: "Geverifieerde indiening via portaal",
+      opportunityType: sub.referenceLabel || "Belegging / Vennootskap",
+      contactName: sub.fullName,
+      contactEmail: sub.email,
+      verified: true,
+      featured: false,
+    }));
 
-  const businessData: BusinessRow[] = businessRows.map((row) => ({
-    id: row.id,
-    name: row.name,
-    category: row.category,
-    location: row.location,
-    entityType: row.entityType,
-    services: row.services,
-    description: row.description,
-    contactPerson: row.contactPerson,
-    contactEmail: row.contactEmail,
-    phone: row.phone,
-    cipcVerified: row.cipcVerified,
-    taxVerified: row.taxVerified,
-    bbbeeLevel: row.bbbeeLevel,
-  }));
+  // Map approved "besigheid" submissions into Besigheidsregister
+  const approvedBusinessSubmissions: BusinessRow[] = approvedSubmissions
+    .filter((sub) => sub.type === "besigheid")
+    .map((sub) => ({
+      id: 100000 + sub.id,
+      name: sub.organisation || sub.fullName,
+      category: sub.referenceLabel || "Geregistreerde Verskaffer",
+      location: "Noord-Kaap / Boegoebaai",
+      entityType: "Geregistreerde Besigheid",
+      services: sub.referenceLabel || "Verskaffer & Dienste",
+      description: sub.message,
+      contactPerson: sub.fullName,
+      contactEmail: sub.email,
+      phone: sub.phone || "Op aanvraag",
+      cipcVerified: true,
+      taxVerified: true,
+      bbbeeLevel: "Geverifieer",
+    }));
+
+  const projectData: ProjectRow[] = [
+    ...approvedProjectSubmissions,
+    ...projectRows.map((row) => ({
+      id: row.id,
+      slug: row.slug,
+      title: row.title,
+      category: row.category,
+      location: row.location,
+      stage: row.stage,
+      timeline: row.timeline,
+      investment: row.investment,
+      jobs: row.jobs,
+      summary: row.summary,
+      description: row.description,
+      requirements: row.requirements,
+      opportunityType: row.opportunityType,
+      contactName: row.contactName,
+      contactEmail: row.contactEmail,
+      verified: row.verified,
+      featured: row.featured,
+    })),
+  ];
+
+  const businessData: BusinessRow[] = [
+    ...approvedBusinessSubmissions,
+    ...businessRows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      category: row.category,
+      location: row.location,
+      entityType: row.entityType,
+      services: row.services,
+      description: row.description,
+      contactPerson: row.contactPerson,
+      contactEmail: row.contactEmail,
+      phone: row.phone,
+      cipcVerified: row.cipcVerified,
+      taxVerified: row.taxVerified,
+      bbbeeLevel: row.bbbeeLevel,
+    })),
+  ];
 
   const opportunityData: OpportunityRow[] = opportunityRows.map((row) => ({
     id: row.id,
@@ -121,4 +175,3 @@ export default async function HomePage() {
     </>
   );
 }
-
