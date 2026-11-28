@@ -27,6 +27,7 @@ export const projects = pgTable("bb_projects", {
   contactEmail: varchar("contact_email", { length: 255 }).notNull(),
   verified: boolean("verified").notNull().default(false),
   featured: boolean("featured").notNull().default(false),
+  active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -63,6 +64,7 @@ export const opportunities = pgTable("bb_opportunities", {
   requirements: text("requirements").notNull(),
   projectId: integer("project_id").references(() => projects.id, { onDelete: "set null" }),
   verified: boolean("verified").notNull().default(false),
+  active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -84,6 +86,7 @@ export const submissions = pgTable("bb_submissions", {
   status: varchar("status", { length: 40 }).notNull().default("nuut"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
 /** Gebruikers, verskaffers en administrateurs. */
 export const users = pgTable("bb_users", {
   id: serial("id").primaryKey(),
@@ -92,5 +95,8 @@ export const users = pgTable("bb_users", {
   passwordHash: text("password_hash").notNull(),
   role: varchar("role", { length: 40 }).notNull().default("gebruiker"), // gebruiker | verskaffer | admin
   organisation: varchar("organisation", { length: 220 }).notNull().default(""),
+  active: boolean("active").notNull().default(true),
+  subscriptionPlan: varchar("subscription_plan", { length: 60 }).notNull().default("gratis"),
+  subscriptionStatus: varchar("subscription_status", { length: 60 }).notNull().default("aktief"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
